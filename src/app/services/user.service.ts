@@ -30,8 +30,8 @@ export class UserService{
 
 
     getUsers(){
-    (this.http.get(firebaseConfig.databaseURL +  '/Users.json')
-                    .map( res => res.json()));
+    return this.http.get(firebaseConfig.databaseURL +  '/Users.json')
+                    .map( res => res.json());
 
   }
 

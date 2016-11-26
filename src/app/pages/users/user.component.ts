@@ -21,8 +21,10 @@ import { User } from './../../entity/user';
 		<label>password</label>
 		<input type="text" [(ngModel)]="password" name="password">
 
-		<button (click)=add()> CLICACACACA </button>
+		<button (click)=add()> Adicionar </button>
 	</form>
+
+		
 	<ul>
 		<li *ngFor= "let user of users | async">
 			<h3>{{user.id}} aa</h3>
@@ -63,7 +65,7 @@ export class UsersComponent implements OnInit{
 	}
 
 
-	ngOnInit() {
+	ngOnInit(){
     	
 	 this.UserService.getUsers()
 			.subscribe(
