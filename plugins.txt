@@ -1,0 +1,13 @@
+nodejs
+npm install npm@latest -g
+
+dentro da pasta no cmd:
+
+npm install
+npm install -g angular-cli
+npm install firebase angularfire2 --save
+
+iniciar:
+
+ng serve
+

@@ -1,79 +1,56 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from "rxjs/Rx";
-import { AngularFire, FirebaseRef } from 'angularfire2';
-import { Http } from '@angular/http';
+
+import { AngularFire, FirebaseListObservable } from 'angularfire2';
 import { UserService } from './../../services/user.service';
-import { Inject } from '@angular/core';
+
 import { User } from './../../entity/user';
 
 
 @Component({
 	selector: 'users',
-	template: `
-	<h1>Usuarios</h1>
-	<form>
-		<label>Id</label>
-		<input type="text" [(ngModel)]="id" name="id">
-
-		<label>Login</label>
-		<input type="text" [(ngModel)]="login" name="login">
-
-		<label>password</label>
-		<input type="text" [(ngModel)]="password" name="password">
-
-		<button (click)=add()> Adicionar </button>
-	</form>
-
-		
-	<ul>
-		<li *ngFor= "let user of users | async">
-			<h3>{{user.id}} aa</h3>
-			<h3>{{user.login}}</h3>
-			<h3>{{user.password}}</h3>
-		</li>	
-	</ul>
-	`
+	templateUrl: './user.component.html',	 
 
 })
 
 export class UsersComponent implements OnInit{
 
-	private users: User[] = [];
-	private id;
-	private login;
-	private password;
-	private newUser;
-	private listUsers: Observable<User[]>;
-	
-	
-		constructor(private UserService: UserService) {
+	newUser: User;
+	users: FirebaseListObservable<User[]>;
 
-		 
+
+	constructor(private af: AngularFire, private userService: UserService){
+		this.initUser();
+
+		this.users = userService.getUsers()
 	}
 
-	add(id, login, password){
-		
-		this.UserService.addUser(this.newUser);
-  }
+	initUser() {
+        this.newUser = new User();
+    }
 
-	delete(id: string){
-		this.UserService.deleteUser(id)
-		.subscribe(
-			() => alert('Deletado!?'),
-			console.error
-		) // ESSE AQUI TA PEGANDO EM !!!!
+
+	pushUser(){
+
+		this.userService.addUser(this.newUser);
+    	alert("usuario " + this.newUser.login + " cadastrado");
+
+		this.initUser();
+  	}
+	
+	getUsers() {	
+			this.userService
+			.getUsers() 
+			this.users = this.af.database.list('/Users');
+	}
+
+	deleteUser(key: string){
+		this.userService.deleteUser(key)
+			alert('Deletado!')			
 	}
 
 
 	ngOnInit(){
-    	
-	 this.UserService.getUsers()
-			.subscribe(
-            data => {this.users = data},
-			error => alert(error),
-			() => console.log("acabou para pf")
-                        
-             );
+		this.getUsers();
 	}
 
 }

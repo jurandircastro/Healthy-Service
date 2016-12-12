@@ -1,50 +1,49 @@
 import { Inject } from '@angular/core';
 import { Observable } from "rxjs/Rx";
-import { AngularFire, FirebaseRef, AngularFireDatabase  } from 'angularfire2';
+import { AngularFire, FirebaseRef, AngularFireDatabase, FirebaseListObservable } from 'angularfire2';
 import { Http, Response } from '@angular/http';
 import { Injectable } from "@angular/core";
 import { firebaseConfig } from './../../environments/firebase.config';
 import { User } from './../entity/user';
 
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/toPromise';
-import 'rxjs/add/operator/map';
 
 @Injectable()
 export class UserService{
-	
-    
+	  
+    users: FirebaseListObservable<User[]>;
 
-	constructor(private db: AngularFireDatabase, private http: Http, @Inject(FirebaseRef) fb) {}
-
-
-    addUser(user: User): Observable<User>{
-        
-        const body = JSON.stringify({user: user});
-
-        return this.http.post('https://healthy-application-2161e.firebaseio.com/Users/', body)
-                    .map(response => response.json())
-                    .catch(this.handleError);
-
-    }
-
-
-    getUsers(){
-    return this.http.get(firebaseConfig.databaseURL +  '/Users.json')
-                    .map( res => res.json());
-
+	constructor(private angularFire: AngularFire, private http: Http) { 
+    this.users = this.angularFire.database.list('/Users', {
+      query: {
+        orderByChild: 'id',
+      }
+    });
   }
 
-    deleteUser(id: string): Observable<any>{
+    addUser(user: User){
+        
+        this.users.push(user);
 
-        const url = firebaseConfig.databaseURL + '/Users/' + id + '.json';
-        return this.http.delete(url);
+    }
+
+    getUsers(){
+        
+    return this.users = this.angularFire.database.list('/Users', {
+      query: {
+        orderByChild: 'id',
+      }
+    });
         
     }
 
+    deleteUser(key: string){
+
+        this.users.remove(key);
+        
+    }
 
     private handleError(error: any): Promise<any> {
-    console.error('An error occurred', error); // for demo purposes only
+    console.error('An error occurred', error);
     return Promise.reject(error.message || error);
   }
 
